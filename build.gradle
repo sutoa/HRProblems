@@ -1,0 +1,40 @@
+defaultTasks 'clean', 'build'
+
+group 'nextgen'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+apply plugin: 'idea'
+
+
+repositories {
+    mavenCentral()
+}
+
+task wrapper(type: Wrapper) {
+    description = 'Generates gradlew scripts for NIX and win envs'
+    gradleVersion = '2.4'
+}
+
+
+buildDir = 'target'
+
+
+idea.module {
+    downloadSources = true
+}
+
+dependencies {
+    compile 'org.slf4j:slf4j-api:1.7.5',
+            'commons-lang:commons-lang:2.6',
+            'com.google.guava:guava:18.0'
+
+    runtime 'org.slf4j:slf4j-log4j12:1.7.5',
+            'log4j:log4j:1.2.17'
+
+    testCompile 'junit:junit:4.11',
+            'org.mockito:mockito-core:1.9.5',
+            'org.assertj:assertj-core:1.0.0'
+}
+
+
