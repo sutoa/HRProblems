@@ -1,4 +1,4 @@
-package org.nextgen.hackerranksolution.journeytomoom;
+package org.nextgen.hackerranksolution.journeytomoon;
 
 import org.junit.Test;
 import org.nextgen.hackranksolution.journeytomoon.Solution;
