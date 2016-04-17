@@ -4,13 +4,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static java.util.Arrays.*;
+import static java.util.Arrays.asList;
 import static java.util.Arrays.sort;
 
 public class Solution {
     private Set<Integer> groupedWithCountry = new HashSet<>();
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
         Solution solution = new Solution();
         final InputContext inputData = solution.readInput();
 
@@ -21,25 +21,27 @@ public class Solution {
 
     }
 
-    public InputContext readInput(){
+    public InputContext readInput() {
         final Scanner input = new Scanner(System.in);
 
         int numberOfPeople = input.nextInt();
         final int numberOfPairs = input.nextInt();
 
-        validateData(numberOfPeople, numberOfPeople);
+        validateData(numberOfPeople, numberOfPairs);
 
         int[][] relationships = new int[numberOfPairs][2];
-        for(int i=0; i<numberOfPairs; i++){
-             relationships[i][0] = input.nextInt();
-             relationships[i][1] = input.nextInt();
+        for (int i = 0; i < numberOfPairs; i++) {
+            relationships[i][0] = input.nextInt();
+            relationships[i][1] = input.nextInt();
         }
         return new InputContext(numberOfPeople, relationships);
     }
 
     private void validateData(int numberOfPeople, int numberOfPair) {
-        if(numberOfPeople > 100000 || numberOfPeople < 1) throw new IllegalArgumentException("Invalid N: " + numberOfPeople);
-        if(numberOfPair > 10000 || numberOfPair < 1) throw new IllegalArgumentException("Invalid I: " + numberOfPeople);
+        if (numberOfPeople > 100000 || numberOfPeople < 1)
+            throw new IllegalArgumentException("Invalid N: " + numberOfPeople);
+        if (numberOfPair > 10000 || numberOfPair < 1)
+            throw new IllegalArgumentException("Invalid I: " + numberOfPeople);
 
     }
 
@@ -48,9 +50,14 @@ public class Solution {
         for (int[] pair : countryMenPairs) {
             sort(pair);
             addPairToRelationship(countrymenRelationship, pair);
+            addPairToRelationship(countrymenRelationship, reverse(pair));
         }
 
         return countrymenRelationship;
+    }
+
+    private int[] reverse(int[] pair) {
+        return new int[]{pair[1], pair[0]};
     }
 
     private void addPairToRelationship(Map<Integer, Set<Integer>> countrymenRelationship, int[] countryMenPairs) {
@@ -66,7 +73,7 @@ public class Solution {
     public Set<Set<Integer>> groupPeopleByCountry(int numberOfCountryMen, Map<Integer, Set<Integer>> countryMenPairs) {
         Set<Set<Integer>> countryMenGroups = new HashSet<>();
         countryMenPairs.keySet().stream().forEach(anchorMan -> {
-            final Set<Integer> compatriots = findCompatriot(anchorMan, countryMenPairs);
+            final Set<Integer> compatriots = findCompatriot(-1, anchorMan, countryMenPairs);
             if (manWithCompatriots(compatriots)) {
                 countryMenGroups.add(compatriots);
             }
@@ -80,7 +87,9 @@ public class Solution {
     private void fillInIsolatedCountryMen(int numberOfCountryMen, Set<Set<Integer>> countryMenGroups) {
         IntStream.range(0, numberOfCountryMen)
                 .filter(idx -> !alreadyGroupedWithACountry(idx))
-                .forEach(idx->countryMenGroups.add(new HashSet<>(asList(idx))));
+                .forEach(idx -> {
+                    countryMenGroups.add(new HashSet<>(asList(idx)));
+                });
 
     }
 
@@ -88,7 +97,7 @@ public class Solution {
         return !compatriat.isEmpty();
     }
 
-    protected Set<Integer> findCompatriot(Integer anchorMan, Map<Integer, Set<Integer>> countryMenPairs) {
+    protected Set<Integer> findCompatriot(Integer parent, Integer anchorMan, Map<Integer, Set<Integer>> countryMenPairs) {
         if (alreadyGroupedWithACountry(anchorMan))
             return new HashSet<>();
 
@@ -103,8 +112,9 @@ public class Solution {
         }
 
         for (Integer neighbor : neighbors) {
-            final Set<Integer> compatriats = findCompatriot(neighbor, countryMenPairs);
-            countryMen.addAll(compatriats);
+            if (neighbor == parent) continue;
+            final Set<Integer> compatriots = findCompatriot(anchorMan, neighbor, countryMenPairs);
+            countryMen.addAll(compatriots);
         }
         return countryMen;
     }
@@ -128,10 +138,10 @@ public class Solution {
     }
 
     public int getNumberOfCombination(int numberOfPeopleInCombo, List<Integer> peopleInGroups) {
-        if(numberOfPeopleInCombo > peopleInGroups.size() || peopleInGroups.isEmpty())
+        if (numberOfPeopleInCombo > peopleInGroups.size() || peopleInGroups.isEmpty())
             return 0;
 
-        if(numberOfPeopleInCombo == 1){
+        if (numberOfPeopleInCombo == 1) {
             return peopleInGroups.stream().mapToInt(Integer::intValue).sum();
         }
 
