@@ -1,4 +1,4 @@
-package org.nextgen.hackranksolution.journeytomoon;
+package org.nextgen.hackerranksolution.journeytomoon;
 
 import java.util.*;
 import java.util.stream.Collectors;
