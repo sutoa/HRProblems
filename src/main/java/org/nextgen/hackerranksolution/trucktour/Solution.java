@@ -6,6 +6,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * while trying stations, if failed with 1..n stations, then there's no need to try 2-n as the starting point,
+ * because we will get negative value at some point.
+ */
 public class Solution {
     private List<Pump> pumps = new ArrayList<>();
     private boolean completed = false;

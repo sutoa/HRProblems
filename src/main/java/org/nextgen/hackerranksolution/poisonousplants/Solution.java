@@ -2,6 +2,11 @@ package org.nextgen.hackerranksolution.poisonousplants;
 
 import java.util.*;
 
+/**
+ * Important points
+ * 1. if new min is found, then discard the previous entries, but need to keep the max days so far
+ * 2. each time we have a descending interval, keep an entry on stack, at the end, it keeps track of the min in the interval
+ */
 public class Solution {
 
     public static void main(String[] args) {
