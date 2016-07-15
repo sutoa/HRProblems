@@ -21,6 +21,7 @@ buildDir = 'target'
 
 
 idea.module {
+idea.module {
     downloadSources = true
 }
 
@@ -34,7 +35,9 @@ dependencies {
 
     testCompile 'junit:junit:4.11',
             'org.mockito:mockito-core:1.9.5',
-            'org.assertj:assertj-core:1.0.0'
+            'org.assertj:assertj-core:1.0.0',
+            'pl.pragmatists:JUnitParams:1.0.4'
+
 }
 
 
