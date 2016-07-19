@@ -9,14 +9,14 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
 
 public enum ChessPieces implements ChessPiece {
-    KING(2) {
+    KING((byte)2) {
         @Override
         public List<BoardPosition> impactedPositions(ChessBoard board, BoardPosition position) {
             return neighborCells(board, position);
         }
     },
 
-    QUEEN(3) {
+    QUEEN((byte)3) {
         @Override
         public List<BoardPosition> impactedPositions(ChessBoard board, BoardPosition position) {
             ImmutableList.Builder<BoardPosition> impactedPositions = new ImmutableList.Builder<>();
@@ -29,7 +29,7 @@ public enum ChessPieces implements ChessPiece {
         }
     },
 
-    KNIGHT(4) {
+    KNIGHT((byte)4) {
         @Override
         public List<BoardPosition> impactedPositions(ChessBoard board, BoardPosition position) {
             ImmutableList.Builder<BoardPosition> impactedPositions = new ImmutableList.Builder<>();
@@ -46,19 +46,19 @@ public enum ChessPieces implements ChessPiece {
 
             return
                     positions.stream()
-                            .filter(p -> board.onTheBoard(p))
+                            .filter(board::onTheBoard)
                             .collect(toList());
         }
     },
 
-    BISHOP(5) {
+    BISHOP((byte)5) {
         @Override
         public List<BoardPosition> impactedPositions(ChessBoard board, BoardPosition position) {
             return diagnalPositions(board, position);
         }
     },
 
-    ROOK(6) {
+    ROOK((byte)6) {
         @Override
         public List<BoardPosition> impactedPositions(ChessBoard board, BoardPosition position) {
             final ImmutableList.Builder<BoardPosition> impactedPositions = new ImmutableList.Builder<>();
@@ -134,13 +134,13 @@ public enum ChessPieces implements ChessPiece {
                 .collect(toList());
     }
 
-    private final int val;
+    private final byte val;
 
-    ChessPieces(int val) {
+    ChessPieces(byte val) {
         this.val = val;
     }
 
-    public int value() {
+    public byte value() {
         return val;
     }
 

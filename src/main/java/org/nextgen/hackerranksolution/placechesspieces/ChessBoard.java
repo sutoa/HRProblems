@@ -8,11 +8,11 @@ import static java.util.Arrays.fill;
 import static java.util.stream.IntStream.range;
 
 public class ChessBoard {
-    static public final int EMPTY_CELL = 0;
-    static public final int THREATENED_CELL = 1;
+    static public final byte EMPTY_CELL = 0;
+    static public final byte THREATENED_CELL = 1;
     static private BoardPosition STARTING_POSITION = new BoardPosition(0, 0);
 
-    private int[] cells;
+    private byte[] cells;
     private int rows;
     private int columns;
     private BoardPosition intendedPosition = STARTING_POSITION;
@@ -21,7 +21,7 @@ public class ChessBoard {
     public ChessBoard(int rows, int columns) {
         this.rows = rows;
         this.columns = columns;
-        cells = new int[rows * columns];
+        cells = new byte[rows * columns];
         fill(cells, EMPTY_CELL);
     }
 
@@ -43,7 +43,7 @@ public class ChessBoard {
 
     }
 
-    public int cellStatus(BoardPosition p) {
+    public byte cellStatus(BoardPosition p) {
         return cells[toIndex(p)];
     }
 
@@ -91,7 +91,7 @@ public class ChessBoard {
     }
 
     public void placePiece(BoardPosition p, ChessPieces piece) {
-        cells[toIndex(p)] = piece.value();
+        cells[toIndex(p)] = (byte)piece.value();
         if(noMorePositionToPlacePiece()) return;
         intendedPosition = shiftPositionRight(p);
     }
@@ -104,7 +104,7 @@ public class ChessBoard {
         return columns;
     }
 
-    public void setCells(int[] cells) {
+    public void setCells(byte[] cells) {
         this.cells = cells;
     }
 
