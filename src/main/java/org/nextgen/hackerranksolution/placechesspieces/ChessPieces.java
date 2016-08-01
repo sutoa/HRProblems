@@ -1,22 +1,26 @@
 package org.nextgen.hackerranksolution.placechesspieces;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Table;
 
+import java.awt.*;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
 
 public enum ChessPieces implements ChessPiece {
-    KING(2) {
+    KING((byte)2) {
         @Override
         public List<BoardPosition> impactedPositions(ChessBoard board, BoardPosition position) {
             return neighborCells(board, position);
         }
     },
 
-    QUEEN(3) {
+    QUEEN((byte)3) {
         @Override
         public List<BoardPosition> impactedPositions(ChessBoard board, BoardPosition position) {
             ImmutableList.Builder<BoardPosition> impactedPositions = new ImmutableList.Builder<>();
@@ -29,7 +33,7 @@ public enum ChessPieces implements ChessPiece {
         }
     },
 
-    KNIGHT(4) {
+    KNIGHT((byte)4) {
         @Override
         public List<BoardPosition> impactedPositions(ChessBoard board, BoardPosition position) {
             ImmutableList.Builder<BoardPosition> impactedPositions = new ImmutableList.Builder<>();
@@ -46,19 +50,19 @@ public enum ChessPieces implements ChessPiece {
 
             return
                     positions.stream()
-                            .filter(p -> board.onTheBoard(p))
+                            .filter(board::onTheBoard)
                             .collect(toList());
         }
     },
 
-    BISHOP(5) {
+    BISHOP((byte)5) {
         @Override
         public List<BoardPosition> impactedPositions(ChessBoard board, BoardPosition position) {
             return diagnalPositions(board, position);
         }
     },
 
-    ROOK(6) {
+    ROOK((byte)6) {
         @Override
         public List<BoardPosition> impactedPositions(ChessBoard board, BoardPosition position) {
             final ImmutableList.Builder<BoardPosition> impactedPositions = new ImmutableList.Builder<>();
@@ -70,7 +74,17 @@ public enum ChessPieces implements ChessPiece {
         }
     };
 
+
+    private static ImpactedPositionPool diagnalImpactedPositionPool = new ImpactedPositionPool();
+    private static ImpactedPositionPool horizontalImpactedPositionPool = new ImpactedPositionPool();
+    private static ImpactedPositionPool verticalImpactedPositionPool = new ImpactedPositionPool();
+
     protected static List<BoardPosition> diagnalPositions(ChessBoard board, BoardPosition position) {
+        Optional<List<BoardPosition>> cachedPositions = diagnalImpactedPositionPool.findPositions(board, position);
+        if(cachedPositions.isPresent()){
+            return cachedPositions.get();
+        }
+
         List<BoardPosition> positions = Lists.newArrayList();
 
         BoardPosition p = position.upperLeft();
@@ -94,22 +108,38 @@ public enum ChessPieces implements ChessPiece {
             p = p.lowerRight();
         }
 
+        diagnalImpactedPositionPool.cachePositions(board, position, positions);
+
         return positions;
     }
 
     private static List<BoardPosition> horizontalPositions(ChessBoard board, BoardPosition position) {
-        return range(0, board.getColumns())
+        Optional<List<BoardPosition>> cachedPositions = horizontalImpactedPositionPool.findPositions(board, position);
+        if(cachedPositions.isPresent()){
+            return cachedPositions.get();
+        }
+
+        final List<BoardPosition> positions = range(0, board.getColumns())
                 .filter(i -> i != position.getY())
                 .mapToObj(i -> new BoardPosition(position.getX(), i))
                 .collect(toList());
+        horizontalImpactedPositionPool.cachePositions(board, position, positions);
+        return positions;
 
     }
 
     private static List<BoardPosition> verticalPositions(ChessBoard board, BoardPosition position) {
-        return range(0, board.getRows())
+        Optional<List<BoardPosition>> cachedPositions = verticalImpactedPositionPool.findPositions(board, position);
+        if(cachedPositions.isPresent()){
+            return cachedPositions.get();
+        }
+
+        final List<BoardPosition> positions = range(0, board.getRows())
                 .filter(i -> i != position.getX())
                 .mapToObj(i -> new BoardPosition(i, position.getY()))
                 .collect(toList());
+        verticalImpactedPositionPool.cachePositions(board, position, positions);
+        return positions;
     }
 
     private static List<BoardPosition> neighborCells(ChessBoard board, BoardPosition location) {
@@ -134,14 +164,30 @@ public enum ChessPieces implements ChessPiece {
                 .collect(toList());
     }
 
-    private final int val;
+    private final byte val;
 
-    ChessPieces(int val) {
+    ChessPieces(byte val) {
         this.val = val;
     }
 
-    public int value() {
+    public byte value() {
         return val;
     }
 
 }
+class ImpactedPositionPool {
+
+    private Table<Dimension, BoardPosition, List<BoardPosition>> cache = HashBasedTable.create();
+
+    Optional<List<BoardPosition>> findPositions(ChessBoard board, BoardPosition position) {
+        final List<BoardPosition> boardPositions = cache.get(new Dimension(board.getRows(), board.getColumns()), position);
+        return boardPositions == null ? Optional.absent() : Optional.of(boardPositions);
+    }
+
+
+    public  void cachePositions(ChessBoard board, BoardPosition position, List<BoardPosition> positions) {
+        cache.put(new Dimension(board.getRows(), board.getColumns()), position, positions);
+    }
+}
+
+
